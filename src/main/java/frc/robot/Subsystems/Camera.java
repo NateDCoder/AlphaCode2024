@@ -28,8 +28,8 @@ public class Camera extends SubsystemBase {
   PhotonPoseEstimator photonPoseEstimator;
   /** Creates a new Camera. */
   public Camera() {
-    camera = new PhotonCamera("Arducam_AprilTags");
-    Transform3d robotToCam = new Transform3d(new Translation3d(.35, 0.08, .18), new Rotation3d(Math.toDegrees(0), Math.toRadians(-30),0)); //Cam mounted facing forward, half a meter forward of center, half a meter up from center.
+    camera = new PhotonCamera("Arducam_OV9281_USB_Camera");
+    Transform3d robotToCam = new Transform3d(new Translation3d(.35, 0, .18), new Rotation3d(Math.toDegrees(0), Math.toRadians(-30),0)); //Cam mounted facing forward, half a meter forward of center, half a meter up from center.
     AprilTagFieldLayout fieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
     photonPoseEstimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, robotToCam);
     photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);

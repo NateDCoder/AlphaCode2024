@@ -136,17 +136,11 @@ public class Shooter extends SubsystemBase {
   }
 
   public void pivotRawPower() {
-    // SmartDashboard.putNumber("Pivot Power", power);
-    // if (Math.abs(power) > 0.1) {
-    // pivot.set(power*.1);
-    // }else {
-    // pivot.set(0);
-    // }
     if (185 < targetAngle && targetAngle < 260) {
       // This is geometry stuff for force required to keep it in a spot
-      SmartDashboard.putNumber("Pivot FF Power", 1.6*pivotFF * (Math.sin(Math.toRadians(getPivotAngle() - 180))+0.7));
+      SmartDashboard.putNumber("Pivot FF Power", 0.0000412372*(getPivotAngle()-170)*(getPivotAngle()-170)+0.0185154);
       double power = -(pivotPID.calculate(getPivotAngle(), targetAngle)
-          + 1.6 * pivotFF * (Math.sin(Math.toRadians(getPivotAngle() - 180))+0.7));
+          + 0.0000412372*(getPivotAngle()-170)*(getPivotAngle()-170)+0.0185154);
       SmartDashboard.putNumber("PID Power", power);
       if (Math.abs(power) < 0.2) {
         pivot.set(power);
