@@ -6,9 +6,9 @@ package frc.robot.Commands;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
 import frc.robot.Subsystems.Shooter;
 
 public class ShooterCommand extends Command {
@@ -18,6 +18,7 @@ public class ShooterCommand extends Command {
   Supplier<Boolean> bButtonSupplier;
   Supplier<Boolean> yButtonSupplier;
   double intakePower = 1000;
+
   public ShooterCommand(Shooter shooter, Supplier<Double> leftYSupplier, Supplier<Boolean> bButtonSupplier,
       Supplier<Boolean> yButtonSupplier) {
     this.shooter = shooter;
@@ -40,16 +41,18 @@ public class ShooterCommand extends Command {
   public void execute() {
     double intakePowerValue = SmartDashboard.getNumber("Intake Power", 0);
     // shooter.pivotRawPower(-leftYSupplier.get());
-    if(intakePowerValue != intakePower) {
-      intakePower = intakePowerValue;
-    }
     shooter.pivotRawPower();
-    if (yButtonSupplier.get()) {
-      shooter.intakeMotorPower(-intakePower);
-    } else if (bButtonSupplier.get()) {
-      shooter.intakeMotorPower(intakePower);
-    } else {
-      shooter.intakeMotorPower(0);
+    if (RobotState.isTeleop()) {
+      if (intakePowerValue != intakePower) {
+        intakePower = intakePowerValue;
+      }
+      if (yButtonSupplier.get()) {
+        shooter.intakeMotorPower(-intakePower);
+      } else if (bButtonSupplier.get()) {
+        shooter.intakeMotorPower(intakePower);
+      } else {
+        shooter.intakeMotorPower(0);
+      }
     }
 
   }
@@ -57,6 +60,7 @@ public class ShooterCommand extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    shooter.intakeMotorPower(0);
   }
 
   // Returns true when the command should end.

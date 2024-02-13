@@ -77,37 +77,6 @@ public class Shooter extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler
     SmartDashboard.putNumber("Pivot Encoder", getPivotAngle());
-    double vel = SmartDashboard.getNumber("Velocity", 0);
-    double pValue = SmartDashboard.getNumber("P Angle", 0);
-    double iValue = SmartDashboard.getNumber("I Angle", 0);
-    double dValue = SmartDashboard.getNumber("D Angle", 0);
-    double angleValue = SmartDashboard.getNumber("Target Angle", 0);
-    double ffValue = SmartDashboard.getNumber("FF Angle", 0);
-
-    if (pValue != p) {
-      pivotPID.setP(pValue);
-      // intakePID.setP(pValue);
-      p = pValue;
-    }
-    if (iValue != i) {
-      pivotPID.setI(iValue);
-      i = iValue;
-    }
-    if (dValue != d) {
-      pivotPID.setD(pValue);
-      d = dValue;
-    }
-    if (ffValue != pivotFF) {
-      // intakePID.setFF(ffValue);
-      pivotFF = ffValue;
-    }
-
-    if ((vel != velocityRPM)) {
-      velocityRPM = vel;
-    }
-    if (angleValue != targetAngle) {
-      targetAngle = angleValue;
-    }
   }
 
   public void feedMotorPower(double power) {
@@ -136,7 +105,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void pivotRawPower() {
-    if (185 < targetAngle && targetAngle < 260) {
+    if (185 < targetAngle && targetAngle < 230) {
       // This is geometry stuff for force required to keep it in a spot
       SmartDashboard.putNumber("Pivot FF Power", 0.0000412372*(getPivotAngle()-170)*(getPivotAngle()-170)+0.0185154);
       double power = -(pivotPID.calculate(getPivotAngle(), targetAngle)

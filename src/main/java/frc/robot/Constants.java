@@ -20,7 +20,7 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
-
+  public static double NathanSpeed = 2;
   public static PIDFF_CONSTANTS shooterPID = new PIDFF_CONSTANTS(6e-5, 0, 0, 0.000180);
 
   public static final int BOTTOM_SHOOTER_MOTOR_ID = 13;

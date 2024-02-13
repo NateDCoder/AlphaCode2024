@@ -70,6 +70,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             if (!firstFail) {
                 failTimer.stop();
             }
+            m_stateLock.writeLock().lock();
             m_odometry.addVisionMeasurement(estimatedCamPose, camTimestampSecs);
         } catch (Exception ex) {
             if (firstFail) {
@@ -77,6 +78,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 firstFail = false;
             }
             SmartDashboard.putNumber("Failing time", failTimer.get());
+        } finally {
+            m_stateLock.writeLock().unlock();
         }
     }
 

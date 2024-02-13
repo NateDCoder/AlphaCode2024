@@ -14,7 +14,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Commands.AutoShoot;
 import frc.robot.Commands.ShooterCommand;
+import frc.robot.Commands.SimpleTwoPieceAuton;
 import frc.robot.Commands.VisionPose;
 import frc.robot.Subsystems.Camera;
 import frc.robot.Subsystems.Shooter;
@@ -24,7 +26,6 @@ public class RobotContainer {
   private double MaxSpeed = 6; // 6 meters per second desired top speed
 
   // Replace all instances of Nathan Speed with MaxSpeed for production code
-  private double NathanSpeed = 2; // Made slower for testing replace for drivers
   private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
 
   /* Setting up bindings for necessary control of the swerve drive platform */
@@ -33,6 +34,8 @@ public class RobotContainer {
   private final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
   private final Camera m_camera;
   private final Shooter m_shooter;
+  private final AutoShoot m_autoshoot;
+  //private final VisionPose m_visionpose;
 
   // Field centric drive
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -48,11 +51,23 @@ public class RobotContainer {
   private void configureBindings() {
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
       drivetrain.applyRequest(() -> drive
-        .withVelocityX(-drivercontroller.getLeftY() * NathanSpeed) // Drive forward with negative Y (forward)
-        .withVelocityY(-drivercontroller.getLeftX() * NathanSpeed) // Drive left with negative X (left)
+        .withVelocityX(-drivercontroller.getLeftY() * Constants.NathanSpeed) // Drive forward with negative Y (forward)
+        .withVelocityY(-drivercontroller.getLeftX() * Constants.NathanSpeed) // Drive left with negative X (left)
         .withRotationalRate(-drivercontroller.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
       )
     );
+
+    operatercontroller.leftBumper().whileTrue(drivetrain.applyRequest(() -> 
+        // Drive forward with negative Y (forward)
+        drive.withVelocityX(-drivercontroller.getLeftY() * Constants.NathanSpeed)
+
+          // Drive left with negative X (left)
+          .withVelocityY(-drivercontroller.getLeftX() * Constants.NathanSpeed)
+
+          // Drive counterclockwise with negative X (left)
+          .withRotationalRate(m_autoshoot.targetAll())
+    ));
+
     m_shooter.setDefaultCommand(new ShooterCommand(m_shooter, () -> operatercontroller.getLeftY(), () -> operatercontroller.b().getAsBoolean(), () -> operatercontroller.y().getAsBoolean()));
 
     drivercontroller.a().whileTrue(
@@ -68,6 +83,8 @@ public class RobotContainer {
     
     operatercontroller.x().whileTrue(Commands.run(() -> m_shooter.feedMotorPower(0.6)));
     operatercontroller.x().whileFalse(Commands.run(() -> m_shooter.feedMotorPower(0)));
+    
+    operatercontroller.leftBumper().whileFalse(Commands.run(() -> m_shooter.targetAngle = 190));
 
     // reset the field-centric heading on left bumper press
     drivercontroller.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
@@ -81,13 +98,17 @@ public class RobotContainer {
 
   public RobotContainer() {
     m_shooter = new Shooter();
-    m_camera = new Camera();
-    m_camera.setDefaultCommand(new VisionPose(drivetrain, m_camera));
+    m_camera = new Camera(drivetrain);
+    m_autoshoot = new AutoShoot(drivetrain, m_shooter, m_camera, drive);
+    
+    // m_visionpose = new VisionPose(drivetrain, m_camera);
+    // m_camera.setDefaultCommand(m_visionpose);
 
     configureBindings();
   }
 
   public Command getAutonomousCommand() {
+    // return new SimpleTwoPieceAuton(m_shooter, m_autoshoot, runAuto);
     return runAuto;
   }
 }
